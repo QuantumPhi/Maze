@@ -1,20 +1,36 @@
-package recurse;
+package main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Maze {
+    public static final int RECURSIVE = 0;
+    public static final int UNION = 1;
+    
     private static int count = 0;
     private Cell[][] maze;
     
     public static void main(String[] args) {
-        Maze maze = new Maze(10, 10);
-        maze.recursiveGen(0, 0, new boolean[maze.getWidth()][(maze.getHeight())]);
+        Maze maze = Maze.genMaze(10, 10, Maze.RECURSIVE);
         System.out.println(maze);
     }
     
-    public Maze(int width, int height) {
+    public static Maze genMaze(int width, int height, int type) {
+        Maze maze = new Maze(width, height);
+        switch(type) {
+            case RECURSIVE:
+                maze.generate((int)(Math.random() * width), (int)(Math.random() * height),
+                        new boolean[maze.getWidth()][maze.getHeight()]);
+                break;
+            case UNION:
+                maze.generate(new boolean[maze.getWidth()][maze.getHeight()]);
+                break;
+        }
+        return maze;
+    }
+    
+    private Maze(int width, int height) {
         maze = new Cell[width*2+1][height*2+1];
         setupCells();
     }
@@ -30,7 +46,7 @@ public class Maze {
         }             
     }
     
-    public void recursiveGen(int x, int y, boolean[][] past) {
+    public void generate(int x, int y, boolean[][] past) {
         past[x][y] = true;
         if(isComplete(past))
             return;
@@ -52,10 +68,14 @@ public class Maze {
             if(maze[(x+neighbors.get(neighbor).x)*2+1][(y+neighbors.get(neighbor).y)*2+1].set != maze[x*2+1][y*2+1].set) {
                 maze[x*2+1+neighbors.get(neighbor).x][y*2+1+neighbors.get(neighbor).y].isWall = false;
                 maze[(x+neighbors.get(neighbor).x)*2+1][(y+neighbors.get(neighbor).y)*2+1].set = maze[x*2+1][y*2+1].set;
-                recursiveGen(x+neighbors.get(neighbor).x, y+neighbors.get(neighbor).y, past);
+                generate(x+neighbors.get(neighbor).x, y+neighbors.get(neighbor).y, past);
             }
             neighborCells.remove(neighbor);
         }
+    }
+    
+    public void generate(boolean[][] array) {
+        
     }
     
     public static boolean isComplete(boolean[][] array) {
