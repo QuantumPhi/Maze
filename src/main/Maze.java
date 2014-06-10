@@ -4,29 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Maze {
-    public static final int RECURSIVE = 0;
-    public static final int UNION = 1;
-    
+public class Maze {    
     private static int count = 0;
     private Cell[][] maze;
     
     public static void main(String[] args) {
-        Maze maze = Maze.genMaze(10, 10, Maze.RECURSIVE);
+        Maze maze = Maze.genMaze(10, 10);
         System.out.println(maze);
     }
     
-    public static Maze genMaze(int width, int height, int type) {
+    public static Maze genMaze(int width, int height) {
         Maze maze = new Maze(width, height);
-        switch(type) {
-            case RECURSIVE:
-                maze.generate((int)(Math.random() * width), (int)(Math.random() * height),
-                        new boolean[maze.getWidth()][maze.getHeight()]);
-                break;
-            case UNION:
-                maze.generate(new boolean[maze.getWidth()][maze.getHeight()]);
-                break;
-        }
+        maze.generate((int)(Math.random() * width), (int)(Math.random() * height),
+                new boolean[maze.getWidth()][maze.getHeight()]);
         return maze;
     }
     
@@ -72,10 +62,6 @@ public class Maze {
             }
             neighborCells.remove(neighbor);
         }
-    }
-    
-    public void generate(boolean[][] array) {
-        
     }
     
     public static boolean isComplete(boolean[][] array) {
