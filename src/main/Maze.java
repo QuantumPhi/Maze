@@ -1,10 +1,14 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Maze {    
     private Cell[][] maze;
+    private List<Cell> walls;
     
     public static void main(String[] args) {
-        Maze maze = Maze.genMaze(10, 10);
+        Maze maze = Maze.genMaze(2, 2);
         System.out.println(maze);
     }
     
@@ -20,31 +24,42 @@ public class Maze {
     }
     
     private void setupCells() {
+        walls = new ArrayList<>();
         for(int i = 0; i < maze.length; i++) {
             for(int j = 0; j < maze[0].length; j++) {
-                maze[i][j] = new Cell();
-                if(i % 2 == 1 && j % 2 == 1)
+                maze[i][j] = new Cell(i, j);
+                if(i % 2 == 1)
+                    maze[i][j].isVertical = false;
+                if(i % 2 == 1 && j % 2 == 1) {
                     maze[i][j].isWall = false;
+                    continue;
+                }
+                if(i % 2 != j % 2)
+                    if(i != 0 && i != maze.length-1 && j != 0 && j != maze[i].length-1)
+                        walls.add(maze[i][j]);
             }
         }             
     }
     
     public void generate() {
-        boolean[][] past = new boolean[getWidth()][getHeight()];
-        
+        int index;
+        Cell wall;
         Cell atemp;
         Cell btemp;
-        while(!isComplete(past)) {
-            atemp = maze[(int)(Math.random()*getWidth()+1)][(int)(Math.random()*getHeight()+1)];
+        while(!walls.isEmpty()) {
+            index = (int)(Math.random() * walls.size());
+            wall = walls.get(index);
+            atemp = wall.isVertical ? maze[wall.x][wall.y+1] : maze[wall.x+1][wall.y];
+            btemp = wall.isVertical ? maze[wall.x][wall.y-1] : maze[wall.x-1][wall.y];
+            System.out.println(wall.x + " " + wall.y);
+            System.out.println(atemp.getRoot() + " " + btemp.getRoot());
+            if(atemp.getRoot() != btemp.getRoot()) {
+                atemp.merge(btemp);
+                System.out.println(atemp.getRoot() + " " + btemp.getRoot());
+                wall.isWall = false;
+            }
+            walls.remove(index);
         }
-    }
-    
-    public static boolean isComplete(boolean[][] array) {
-        for(int i = 0; i < array.length; i++)
-            for(int j = 0; j < array[0].length; j++)
-                if(!array[i][j])
-                    return false;
-        return true;
     }
     
     public int getWidth() { return (maze.length-1)/2; }
@@ -68,14 +83,22 @@ public class Maze {
 
 class Cell { 
     public Cell parent;
+    public boolean isVertical = true;
     public boolean isWall = true;
     
-    public void merge(Cell other) {
-        parent = other;
+    public int x, y;
+    
+    public Cell(int i, int j) {
+        x = i;
+        y = j;
     }
     
-    public Cell getParent() {
-        Cell p = parent == null ? this : parent.getParent();
+    public void merge(Cell other) {
+        parent = other.getRoot();
+    }
+    
+    public Cell getRoot() {
+        Cell p = parent == null ? this : parent.getRoot();
         if(parent != null && parent != p)
             parent = p;
         return p;
