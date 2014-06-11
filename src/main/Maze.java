@@ -1,11 +1,6 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class Maze {    
-    private static int count = 0;
     private Cell[][] maze;
     
     public static void main(String[] args) {
@@ -15,8 +10,7 @@ public class Maze {
     
     public static Maze genMaze(int width, int height) {
         Maze maze = new Maze(width, height);
-        maze.generate((int)(Math.random() * width), (int)(Math.random() * height),
-                new boolean[maze.getWidth()][maze.getHeight()]);
+        maze.generate();
         return maze;
     }
     
@@ -28,39 +22,20 @@ public class Maze {
     private void setupCells() {
         for(int i = 0; i < maze.length; i++) {
             for(int j = 0; j < maze[0].length; j++) {
-                maze[i][j] = new Cell(count);
-                count++;
+                maze[i][j] = new Cell();
                 if(i % 2 == 1 && j % 2 == 1)
                     maze[i][j].isWall = false;
             }
         }             
     }
     
-    public void generate(int x, int y, boolean[][] past) {
-        past[x][y] = true;
-        if(isComplete(past))
-            return;
-        HashMap<Cell, Point> neighbors = new HashMap<>();
-        for(int i = -1; i < 2; i++)
-            for(int j = -1; j < 2; j++)
-                if(Math.abs(i) != Math.abs(j))
-                    if((x+i)*2+1 > 0 && (x+i)*2+1 < maze.length && (y+j)*2+1 > 0 && (y+j)*2+1 < maze[0].length)
-                        neighbors.put(maze[(x+i)*2+1][(y+j)*2+1], new Point(i, j));
+    public void generate() {
+        boolean[][] past = new boolean[getWidth()][getHeight()];
         
-        int rand;
-        Cell neighbor;
-        List<Cell> neighborCells = new ArrayList<>(neighbors.keySet());
-        while(true) {
-            rand = (int)(Math.random() * neighborCells.size());
-            if(neighborCells.isEmpty())
-                break;
-            neighbor = neighborCells.get(rand);
-            if(maze[(x+neighbors.get(neighbor).x)*2+1][(y+neighbors.get(neighbor).y)*2+1].set != maze[x*2+1][y*2+1].set) {
-                maze[x*2+1+neighbors.get(neighbor).x][y*2+1+neighbors.get(neighbor).y].isWall = false;
-                maze[(x+neighbors.get(neighbor).x)*2+1][(y+neighbors.get(neighbor).y)*2+1].set = maze[x*2+1][y*2+1].set;
-                generate(x+neighbors.get(neighbor).x, y+neighbors.get(neighbor).y, past);
-            }
-            neighborCells.remove(neighbor);
+        Cell atemp;
+        Cell btemp;
+        while(!isComplete(past)) {
+            atemp = maze[(int)(Math.random()*getWidth()+1)][(int)(Math.random()*getHeight()+1)];
         }
     }
     
@@ -92,11 +67,18 @@ public class Maze {
 }
 
 class Cell { 
-    public int set;
+    public Cell parent;
     public boolean isWall = true;
     
-    public Cell(int s) {
-        set = s;
+    public void merge(Cell other) {
+        parent = other;
+    }
+    
+    public Cell getParent() {
+        Cell p = parent == null ? this : parent.getParent();
+        if(parent != null && parent != p)
+            parent = p;
+        return p;
     }
 }
 
