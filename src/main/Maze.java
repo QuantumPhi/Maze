@@ -8,7 +8,7 @@ public class Maze {
     private List<Cell> walls;
     
     public static void main(String[] args) {
-        Maze maze = Maze.genMaze(2, 2);
+        Maze maze = Maze.genMaze(10, 10);
         System.out.println(maze);
     }
     
@@ -29,7 +29,7 @@ public class Maze {
             for(int j = 0; j < maze[0].length; j++) {
                 maze[i][j] = new Cell(i, j);
                 if(i % 2 == 1)
-                    maze[i][j].isVertical = false;
+                    maze[i][j].vertAlign = false;
                 if(i % 2 == 1 && j % 2 == 1) {
                     maze[i][j].isWall = false;
                     continue;
@@ -49,17 +49,10 @@ public class Maze {
         while(!walls.isEmpty()) {
             index = (int)(Math.random() * walls.size());
             wall = walls.get(index);
-            atemp = wall.isVertical ? maze[wall.x][wall.y+1] : maze[wall.x+1][wall.y];
-            btemp = wall.isVertical ? maze[wall.x][wall.y-1] : maze[wall.x-1][wall.y];
-            System.out.println(wall.x + " " + wall.y);
-            System.out.println(atemp.x + " " + atemp.y);
-            System.out.println(btemp.x + " " + btemp.y);
-            System.out.println(atemp.getRoot() + " " + btemp.getRoot());
-            if(atemp.getRoot() != btemp.getRoot()) {
-                if(atemp.merge(btemp))
-                    wall.isWall = false;
-            }
-            System.out.println();
+            atemp = wall.vertAlign ? maze[wall.x+1][wall.y] : maze[wall.x][wall.y+1];
+            btemp = wall.vertAlign ? maze[wall.x-1][wall.y] : maze[wall.x][wall.y-1];
+            if(atemp.merge(btemp))
+                wall.isWall = false;
             walls.remove(index);
         }
     }
@@ -85,7 +78,7 @@ public class Maze {
 
 class Cell { 
     public Cell parent;
-    public boolean isVertical = true;
+    public boolean vertAlign = true;
     public boolean isWall = true;
     
     public int x, y;
@@ -96,9 +89,10 @@ class Cell {
     }
     
     public boolean merge(Cell other) {
-        getRoot();
-        if(parent != other.getRoot()) {
-            parent = other.getRoot();
+        Cell p = getRoot();
+        Cell o = other.getRoot();
+        if(p != o) {
+            o.parent = p;
             return true;
         }
         return false;
