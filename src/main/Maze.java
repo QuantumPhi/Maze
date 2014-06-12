@@ -35,7 +35,8 @@ public class Maze {
                     continue;
                 }
                 if(i % 2 != j % 2)
-                    if(i != 0 && i != maze.length-1 && j != 0 && j != maze[i].length-1)
+                    if(i != 0 && i != maze.length-1 && 
+                            j != 0 && j != maze[i].length-1)
                         walls.add(maze[i][j]);
             }
         }             
@@ -49,8 +50,10 @@ public class Maze {
         while(!walls.isEmpty()) {
             index = (int)(Math.random() * walls.size());
             wall = walls.get(index);
-            atemp = wall.vertAlign ? maze[wall.x+1][wall.y] : maze[wall.x][wall.y+1];
-            btemp = wall.vertAlign ? maze[wall.x-1][wall.y] : maze[wall.x][wall.y-1];
+            atemp = wall.vertAlign ? maze[wall.x+1][wall.y] : 
+                    maze[wall.x][wall.y+1];
+            btemp = wall.vertAlign ? maze[wall.x-1][wall.y] : 
+                    maze[wall.x][wall.y-1];
             if(atemp.merge(btemp))
                 wall.isWall = false;
             walls.remove(index);
