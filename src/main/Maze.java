@@ -52,12 +52,14 @@ public class Maze {
             atemp = wall.isVertical ? maze[wall.x][wall.y+1] : maze[wall.x+1][wall.y];
             btemp = wall.isVertical ? maze[wall.x][wall.y-1] : maze[wall.x-1][wall.y];
             System.out.println(wall.x + " " + wall.y);
+            System.out.println(atemp.x + " " + atemp.y);
+            System.out.println(btemp.x + " " + btemp.y);
             System.out.println(atemp.getRoot() + " " + btemp.getRoot());
             if(atemp.getRoot() != btemp.getRoot()) {
-                atemp.merge(btemp);
-                System.out.println(atemp.getRoot() + " " + btemp.getRoot());
-                wall.isWall = false;
+                if(atemp.merge(btemp))
+                    wall.isWall = false;
             }
+            System.out.println();
             walls.remove(index);
         }
     }
@@ -93,8 +95,13 @@ class Cell {
         y = j;
     }
     
-    public void merge(Cell other) {
-        parent = other.getRoot();
+    public boolean merge(Cell other) {
+        getRoot();
+        if(parent != other.getRoot()) {
+            parent = other.getRoot();
+            return true;
+        }
+        return false;
     }
     
     public Cell getRoot() {
