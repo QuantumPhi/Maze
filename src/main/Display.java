@@ -24,7 +24,7 @@ public class Display extends JFrame {
         Maze maze = Maze.create(w,h);
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+        setResizable(true);
         setVisible(true);
         setTitle("Maze");
         
