@@ -7,12 +7,7 @@ public class Maze {
     private Cell[][] maze;
     private List<Cell> walls;
     
-    public static void main(String[] args) {
-        Maze maze = Maze.genMaze(10, 10);
-        System.out.println(maze);
-    }
-    
-    public static Maze genMaze(int width, int height) {
+    public static Maze create(int width, int height) {
         Maze maze = new Maze(width, height);
         maze.generate();
         return maze;
@@ -62,6 +57,8 @@ public class Maze {
     
     public int getWidth() { return (maze.length-1)/2; }
     public int getHeight() { return (maze[0].length-1)/2; }
+    
+    public Cell[][] getCells() { return maze; }
     
     @Override
     public String toString() {
